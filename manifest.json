@@ -1,0 +1,11 @@
+﻿
+  {
+    "Name": "Mortician Mod",
+    "Author": "Athos",
+    "Version": "1.0.0",
+    "Description": "为星露谷添加入殓师NPC和相关内容",
+    "UniqueID": "Athos.MorticianMod",
+    "EntryDll": "MorticianMod.dll",
+    "MinimumApiVersion": "4.0.0",
+    "UpdateKeys": []
+  }

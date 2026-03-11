@@ -1,0 +1,32 @@
+﻿{
+  "furnitureDatas": [
+    {
+      "id": "Athos.MorticianMod/MorticianPainting",
+      "name": "MorticianPainting",
+      "furniture_type": "painting",
+      "tilesheet_size": "1 2",
+      "bounding_box_size": "1 2",
+      "rotations": 2,
+      "price": 2500,
+      "placement_restriction": -1,
+      "display_name": "入殓师传说",
+      "sprite_index": 0,
+      "texture": "assets|furniture|mortician_painting.png",
+      "off_limits_for_random_sale": false
+    },
+    {
+      "id": "Athos.MorticianMod/UndertakerShelf",
+      "name": "UndertakerShelf",
+      "furniture_type": "bookcase",
+      "tilesheet_size": "2 2",
+      "bounding_box_size": "2 1",
+      "rotations": 2,
+      "price": 2500,
+      "placement_restriction": -1,
+      "display_name": "入殓师书架",
+      "sprite_index": 0,
+      "texture": "assets|furniture|undertaker_shelf.png",
+      "off_limits_for_random_sale": false
+    }
+  ]
+}
