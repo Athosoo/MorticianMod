@@ -111,7 +111,10 @@ namespace MorticianMod.Models
         [JsonPropertyName("sconce")] sconce,
         [JsonPropertyName("randomized_plant")] randomized_plant,
         [JsonPropertyName("fishtank")] fishtank,
+    }
 
-
+    public class FurnitureDataWrapper
+    {
+        public List<FurnitureData> furnitureDatas { get; set; }
     }
 }

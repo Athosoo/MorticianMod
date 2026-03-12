@@ -24,10 +24,6 @@ namespace MorticianMod.AssetLoader
         }
         // 缓存解析后的数据，避免多次读取
         private List<FurnitureData> cachedFurnitureData;
-        private class FurnitureDataWrapper
-        {
-            public List<FurnitureData> furnitureDatas { get; set; }
-        }
         /// <summary>
         /// 从 JSON 加载家具数据列表到缓存数据
         /// </summary>

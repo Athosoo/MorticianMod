@@ -7,9 +7,9 @@ namespace MorticianMod.src
 {
     public class ModInfo
     {
-        public static string _UniqueID { get; } = "Athos.MorticianMod";
-        public static string _ShortID { get; } = "MorticianMod";
-        public static string _Author { get; } = "Athos";
+        public static string _UniqueID = "Athos.MorticianMod";
+        public static string _ShortID = "MorticianMod";
+        public static string _Author = "Athos";
     }
     public class MorticianMod : Mod
     {
@@ -20,6 +20,7 @@ namespace MorticianMod.src
             var assetLoaders = new List<IAssetLoader>
             {
                 new FurnitureLoader(),
+                new NotesLoader(),
                 // 以后添加其他加载器
             };
 
