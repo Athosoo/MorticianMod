@@ -5,7 +5,7 @@ using StardewValley.Delegates;
 
 namespace MorticianMod.src
 {
-    public class ModDebug
+    public class ModInfo
     {
         public static string _UniqueID { get; } = "Athos.MorticianMod";
         public static string _ShortID { get; } = "MorticianMod";

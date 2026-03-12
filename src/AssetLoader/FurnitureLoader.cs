@@ -11,13 +11,10 @@ namespace MorticianMod.AssetLoader
     public class FurnitureLoader : IAssetLoader
     {
         public string LoaderName => "FurnitureLoader";
-        public string LoaderDescription => "用于加载assets/furniture和assets/notes的加载器";
-
-        private string _UniqueID = ModDebug._UniqueID; 
+        public string LoaderDescription => "用于加载assets/furniture加载器类";
+        private string _UniqueID = ModInfo._UniqueID; 
         private IModHelper _helper;
         private IMonitor _monitor;
-        
-
         public void Register(IModHelper helper, IMonitor monitor)
         {
             _helper = helper;
@@ -25,16 +22,12 @@ namespace MorticianMod.AssetLoader
             _helper.Events.Content.AssetRequested += OnAssetRequested;
             _monitor.Log($"[{_UniqueID}]::->{LoaderName}<-已注册", LogLevel.Debug);
         }
-
         // 缓存解析后的数据，避免多次读取
         private List<FurnitureData> cachedFurnitureData;
-        private Dictionary<int, string> cachedNotesData;
-
         private class FurnitureDataWrapper
         {
             public List<FurnitureData> furnitureDatas { get; set; }
         }
-
         /// <summary>
         /// 从 JSON 加载家具数据列表到缓存数据
         /// </summary>
@@ -81,45 +74,6 @@ namespace MorticianMod.AssetLoader
                 return null;
             }
         }
-
-        /// <summary>
-        /// 从 JSON 加载秘密纸条数据到缓存数据
-        /// </summary>
-        private Dictionary<int, string> LoadNotesFromJson()
-        {
-            if (cachedNotesData != null)
-                return cachedNotesData;
-
-            try
-            {
-                string fullPath = Path.Combine(_helper.DirectoryPath, "assets", "notes", "secret_notes.json");
-                if (!File.Exists(fullPath))
-                {
-                    _monitor.Log($"[{_UniqueID}]::秘密纸条文件不存在: {fullPath}", LogLevel.Debug);
-                    return null;
-                }
-
-                string json = File.ReadAllText(fullPath);
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    AllowTrailingCommas = true,
-                    ReadCommentHandling = JsonCommentHandling.Skip
-                };
-                /// 加载到缓存字段中
-                cachedNotesData = JsonSerializer.Deserialize<Dictionary<int, string>>(json, options);
-
-                _monitor.Log($"[{_UniqueID}]::成功加载 {cachedNotesData?.Count ?? 0} 个秘密纸条", LogLevel.Debug);
-                _monitor.Log($"[{_UniqueID}]::调用LoadNotesFromJson完毕");
-                return cachedNotesData;
-            }
-            catch (Exception ex)
-            {
-                _monitor.Log($"[{_UniqueID}]::读取秘密纸条 JSON 失败: {ex.Message}", LogLevel.Error);
-                return null;
-            }
-        }
-
         public void OnAssetRequested(object sender, AssetRequestedEventArgs e)
         {
             // 处理家具数据
@@ -174,34 +128,6 @@ namespace MorticianMod.AssetLoader
                         e.LoadFromModFile<Texture2D>($"{path_now}", AssetLoadPriority.Medium);
                     }
                 }
-            }
-            // 处理秘密纸条数据
-            else if (e.NameWithoutLocale.IsEquivalentTo("Data/SecretNotes"))
-            {
-                e.Edit(asset =>
-                {
-                    var data = asset.AsDictionary<int, string>().Data;
-                    var notes = LoadNotesFromJson();
-                    if (notes != null)
-                    {
-                        foreach (var kvp in notes)
-                        {
-                            if (!data.ContainsKey(kvp.Key))
-                            {
-                                data[kvp.Key] = kvp.Value;
-                                _monitor.Log($"[{_UniqueID}]::已添加秘密纸条 ID: {kvp.Key}", LogLevel.Debug);
-                            }
-                            else
-                            {
-                                _monitor.Log($"[{_UniqueID}]::纸条 ID {kvp.Key} 已存在，跳过", LogLevel.Debug);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        _monitor.Log($"[{_UniqueID}]::调用LoadNoteFromJson后的返回值notes为null.", LogLevel.Debug);
-                    }
-                });
             }
         }
     }
