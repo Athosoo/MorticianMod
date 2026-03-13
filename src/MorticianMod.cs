@@ -36,7 +36,7 @@ namespace MorticianMod.src
                     }
                     catch (Exception e)
                     {
-                        Monitor.Log($"加载器{loader.LoaderName}调用Register注册异常", LogLevel.Debug);
+                        Monitor.Log($"加载器{loader.LoaderName}调用Register注册异常:{e.Message}", LogLevel.Warn);
                     }
                 }
                 catch

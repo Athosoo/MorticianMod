@@ -1,6 +1,7 @@
 ﻿using MorticianMod.Models;
 using Newtonsoft.Json;
 using System.Net.Mail;
+using StardewValley.GameData.Objects;
 
 public class CustomSecretNoteData
 {
@@ -53,3 +54,4 @@ public class NotesDatasWrapper
 {
     public List<CustomSecretNoteData>? NoteDatas { get; set; }
 }
+
