@@ -223,9 +223,8 @@ public class NotesLoader : IAssetLoader
                             Price = 0,
                             Category = -1,
                             Edibility = -300,
-                            Texture = "Maps/springobjects", 
+                            Texture = "Maps/springobjects",
                             SpriteIndex = 79,
-                            
                         };
                         objectsData[itemId] = newObjectData;
                     }
