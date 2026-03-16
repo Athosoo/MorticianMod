@@ -1,4 +1,4 @@
-﻿
+
 using MorticianMod.Interface;
 using MorticianMod.Models;
 using MorticianMod.src;
@@ -9,6 +9,7 @@ using StardewValley.GameData.Objects;
 using System.Text.Json;
 using System.Threading;
 using System.Xml;
+using System.IO;
 
 namespace MorticianMod.AssetLoader;
 
@@ -20,11 +21,25 @@ public class NotesLoader : IAssetLoader
     private IModHelper _helper;
     private IMonitor _monitor;
 
+    // 新添加的组件
+    private ItemUseDetector _itemUseDetector;
+    private NoteDisplayManager _noteDisplayManager;
+    private NoteActionManager _noteActionManager;
+
     private Dictionary<string, int> _idMappings;
     public void Register(IModHelper helper, IMonitor monitor)
     {
         _helper = helper;
         _monitor = monitor;
+
+        // 初始化新组件
+        _itemUseDetector = new ItemUseDetector();
+        _noteDisplayManager = new NoteDisplayManager();
+        _noteActionManager = new NoteActionManager();
+
+        _itemUseDetector.Initialize(helper, monitor);
+        _noteDisplayManager.Initialize(helper, monitor);
+        _noteActionManager.Initialize(helper, monitor);
 
         loadCustomSecretNoteDatasFromJson();
         string mapPath = Path.Combine(_helper.DirectoryPath, "assets", "notes", "ID_mapping.json");
@@ -48,7 +63,7 @@ public class NotesLoader : IAssetLoader
             if (!Context.IsWorldReady)
                 return;
 
-            // 按下 F12 键给予第一个自定义纸条的物品
+            // 按下 M 键给予第一个自定义纸条的物品
             if (args.Button == SButton.M)
             {
                 if (cachedCustomSecretNoteDatas != null && cachedCustomSecretNoteDatas.Count > 0)
@@ -65,6 +80,17 @@ public class NotesLoader : IAssetLoader
                 }
             }
         };
+
+        // 注册秘密纸条物品使用规则
+        var noteUseRule = new ItemUseRule
+        {
+            TargetItemId = 0, // 由于我们使用名称匹配，这里设为0
+            TriggerType = UseTrigger.RightClick,
+            SuppressOriginalBehavior = true,
+            OnItemUsed = HandleNoteItemUse
+        };
+        _itemUseDetector.RegisterUseRule(noteUseRule);
+
         _monitor.Log($"[{_UniqueID}]::->{LoaderName}<-已注册", LogLevel.Alert);
     }
 
@@ -72,52 +98,94 @@ public class NotesLoader : IAssetLoader
     private List<ObjectData> cachedObjectDatas;
    
     private List<CustomSecretNoteData> loadCustomSecretNoteDatasFromJson()
-    {
-        _monitor.Log($"[{LoaderName}]::loadCustomSecretNoteDatasFromJson方法被调用",LogLevel.Alert);
-        if (cachedCustomSecretNoteDatas != null)
-            return cachedCustomSecretNoteDatas;
-        try
         {
-            string fullPath = Path.Combine(_helper.DirectoryPath, "assets", "notes", "secret_notes.json");
-            if (!File.Exists(fullPath))
+            _monitor.Log($"[{LoaderName}]::loadCustomSecretNoteDatasFromJson方法被调用",LogLevel.Alert);
+            if (cachedCustomSecretNoteDatas != null)
+                return cachedCustomSecretNoteDatas;
+            try
             {
-                _monitor.Log($"[{LoaderName}]::秘密纸条数据文件不存在: {fullPath}", LogLevel.Error);
-                return null;
+                string fullPath = Path.Combine(_helper.DirectoryPath, "assets", "notes", "secret_notes.json");
+                if (!File.Exists(fullPath))
+                {
+                    _monitor.Log($"[{LoaderName}]::秘密纸条数据文件不存在: {fullPath}", LogLevel.Error);
+                    return null;
+                }
+
+                string json = File.ReadAllText(fullPath);
+                _monitor.Log($"[{LoaderName}]::成功读取JSON文件，内容长度: {json.Length} 字符", LogLevel.Alert);
+
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    AllowTrailingCommas = true,
+                    ReadCommentHandling = JsonCommentHandling.Skip
+                };
+
+                var wrapper = JsonSerializer.Deserialize<NotesDatasWrapper>(json, options);
+
+                if (wrapper == null)
+                {
+                    _monitor.Log($"[{LoaderName}]::反序列化后 wrapper 为 null", LogLevel.Alert);
+                    return null;
+                }
+
+                _monitor.Log($"[{LoaderName}]::已知反序列化wrapper非空,其NoteDatas属性是否为空:{wrapper.NoteDatas == null}",LogLevel.Alert);
+
+                cachedCustomSecretNoteDatas = wrapper?.NoteDatas;
+
+                _monitor.Log($"[{LoaderName}]::成功加载 {cachedCustomSecretNoteDatas?.Count ?? 0} 个秘密纸条", LogLevel.Alert);
+                _monitor.Log($"[{LoaderName}]::调用LoadCustomSecretNoteDatasFromJson完毕", LogLevel.Alert);
+                return cachedCustomSecretNoteDatas;
             }
-
-            string json = File.ReadAllText(fullPath);
-            _monitor.Log($"[{LoaderName}]::成功读取JSON文件，内容长度: {json.Length} 字符", LogLevel.Alert);
-
-            var options = new JsonSerializerOptions
+            catch (Exception e)
             {
-                PropertyNameCaseInsensitive = true,
-                AllowTrailingCommas = true,
-                ReadCommentHandling = JsonCommentHandling.Skip
-            };
-
-            var wrapper = JsonSerializer.Deserialize<NotesDatasWrapper>(json, options);
-
-            if (wrapper == null)
-            {
-                _monitor.Log($"[{LoaderName}]::反序列化后 wrapper 为 null", LogLevel.Alert);
-                return null;
+                _monitor.Log($"[{_UniqueID}]::LoadCustomSecretNoteDatasFromJson进入异常分支!",LogLevel.Warn);
+                throw;
             }
-
-            _monitor.Log($"[{LoaderName}]::已知反序列化wrapper非空,其NoteDatas属性是否为空:{wrapper.NoteDatas == null}",LogLevel.Alert);
-
-            cachedCustomSecretNoteDatas = wrapper?.NoteDatas;
-
-            _monitor.Log($"[{LoaderName}]::成功加载 {cachedCustomSecretNoteDatas?.Count ?? 0} 个秘密纸条", LogLevel.Alert);
-            _monitor.Log($"[{LoaderName}]::调用LoadCustomSecretNoteDatasFromJson完毕", LogLevel.Alert);
             return cachedCustomSecretNoteDatas;
         }
-        catch (Exception e)
+
+        /// <summary>
+        /// 处理秘密纸条物品的使用
+        /// </summary>
+        /// <param name="player">玩家</param>
+        /// <param name="item">物品</param>
+        /// <param name="trigger">触发方式</param>
+        private void HandleNoteItemUse(Farmer player, Item item, UseTrigger trigger)
         {
-            _monitor.Log($"[{_UniqueID}]::LoadCustomSecretNoteDatasFromJson进入异常分支!",LogLevel.Warn);
-            throw;
+            try
+            {
+                if (item == null)
+                    return;
+
+                string itemName = item.Name;
+                _monitor.Log($"处理纸条物品使用: {itemName}", LogLevel.Debug);
+
+                // 提取纸条ID
+                string noteId = itemName.Replace($"{_UniqueID}_", "");
+                _monitor.Log($"提取纸条ID: {noteId}", LogLevel.Debug);
+
+                // 查找对应的纸条数据
+                CustomSecretNoteData noteData = cachedCustomSecretNoteDatas?.Find(note => note.Id == noteId);
+                if (noteData == null)
+                {
+                    _monitor.Log($"未找到纸条数据: {noteId}", LogLevel.Warn);
+                    return;
+                }
+
+                _monitor.Log($"找到纸条数据: {noteData.Id}, IntId={noteData.IntId}", LogLevel.Debug);
+
+                // 显示纸条
+                _noteDisplayManager.ShowSecretNote(noteData);
+
+                // 触发纸条动作
+                _noteActionManager.TriggerNoteActions(noteData);
+
+            } catch (Exception ex)
+            {
+                _monitor.Log($"处理纸条物品使用时出错: {ex.Message}", LogLevel.Error);
+            }
         }
-        return cachedCustomSecretNoteDatas;
-    }
 
     public void OnAssetRequested(object sender, AssetRequestedEventArgs e)
     {
