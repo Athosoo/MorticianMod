@@ -1,0 +1,44 @@
+{
+  "Attachments": [
+    {
+      "ItemId": "Athos.MorticianMod_note1",
+      "Attachments": [
+        {
+          "Type": "Item",
+          "ItemId": "74",
+          "Quantity": 1,
+          "Chance": 1.0
+        },
+        {
+          "Type": "Item",
+          "ItemId": "382",
+          "Quantity": 5,
+          "Chance": 0.5
+        }
+      ]
+    },
+    {
+      "ItemId": "Athos.MorticianMod_note2",
+      "Attachments": [
+        {
+          "Type": "Item",
+          "ItemId": "296",
+          "Quantity": 1,
+          "Chance": 1.0
+        }
+      ]
+    }
+  ],
+  "Events": [
+    {
+      "EventName": "SecretNote",
+      "ItemId": "Athos.MorticianMod_note1",
+      "TriggerType": "RightClick"
+    },
+    {
+      "EventName": "SecretNote",
+      "ItemId": "Athos.MorticianMod_note2",
+      "TriggerType": "RightClick"
+    }
+  ]
+}

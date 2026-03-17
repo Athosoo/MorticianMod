@@ -1,4 +1,4 @@
-﻿using MorticianMod.Models;
+using MorticianMod.Models;
 using Newtonsoft.Json;
 using System.Net.Mail;
 using StardewValley.GameData.Objects;
@@ -53,5 +53,38 @@ public class TriggerAction
 public class NotesDatasWrapper
 {
     public List<CustomSecretNoteData>? NoteDatas { get; set; }
+}
+
+public class Attachment
+{
+    [JsonProperty("Type")]
+    public string Type { get; set; }
+
+    [JsonProperty("ItemId")]
+    public string ItemId { get; set; }
+
+    [JsonProperty("Quantity")]
+    public int Quantity { get; set; }
+
+    [JsonProperty("Chance")]
+    public float Chance { get; set; } = 1.0f; // 默认100%概率
+}
+
+public class TextureData
+{
+    [JsonProperty("Path")]
+    public string Path { get; set; }
+
+    [JsonProperty("Width")]
+    public int Width { get; set; }
+
+    [JsonProperty("Height")]
+    public int Height { get; set; }
+
+    [JsonProperty("X")]
+    public int X { get; set; }
+
+    [JsonProperty("Y")]
+    public int Y { get; set; }
 }
 

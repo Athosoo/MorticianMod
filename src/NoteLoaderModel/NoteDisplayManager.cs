@@ -3,10 +3,11 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace MorticianMod.AssetLoader
+namespace MorticianMod.NoteLoaderModel
 {
     /// <summary>
     /// 纸条展示管理器
@@ -48,6 +49,18 @@ namespace MorticianMod.AssetLoader
                     return;
                 }
 
+                // 处理内容图片
+                if (!string.IsNullOrEmpty(noteData.ContentImagePath))
+                {
+                    TryLoadContentImage(noteData.ContentImagePath);
+                }
+
+                // 处理背景图片
+                if (!string.IsNullOrEmpty(noteData.BackgroundImagePath))
+                {
+                    TryLoadBackgroundImage(noteData.BackgroundImagePath);
+                }
+
                 // 使用星露谷原生的信件消息显示机制
                 if (noteData.IntId > 0)
                 {
@@ -82,6 +95,66 @@ namespace MorticianMod.AssetLoader
             {
                 _monitor.Log($"显示纸条时出错: {ex.Message}", LogLevel.Error);
                 _monitor.Log($"堆栈跟踪: {ex.StackTrace}", LogLevel.Error);
+            }
+        }
+
+        /// <summary>
+        /// 尝试加载内容图片
+        /// </summary>
+        /// <param name="imagePath">图片路径</param>
+        private void TryLoadContentImage(string imagePath)
+        {
+            try
+            {
+                _monitor.Log($"尝试加载内容图片: {imagePath}", LogLevel.Debug);
+                
+                // 检查图片文件是否存在
+                string fullPath = Path.Combine(_helper.DirectoryPath, imagePath);
+                if (File.Exists(fullPath))
+                {
+                    _monitor.Log($"内容图片存在: {fullPath}", LogLevel.Debug);
+                    
+                    // 这里可以实现图片加载逻辑
+                    // 由于drawLetterMessage不直接支持图片，我们可以考虑其他方式
+                    // 例如创建自定义菜单或使用其他显示方式
+                }
+                else
+                {
+                    _monitor.Log($"内容图片不存在: {fullPath}", LogLevel.Warn);
+                }
+            }
+            catch (Exception ex)
+            {
+                _monitor.Log($"加载内容图片时出错: {ex.Message}", LogLevel.Error);
+            }
+        }
+
+        /// <summary>
+        /// 尝试加载背景图片
+        /// </summary>
+        /// <param name="imagePath">图片路径</param>
+        private void TryLoadBackgroundImage(string imagePath)
+        {
+            try
+            {
+                _monitor.Log($"尝试加载背景图片: {imagePath}", LogLevel.Debug);
+                
+                // 检查图片文件是否存在
+                string fullPath = Path.Combine(_helper.DirectoryPath, imagePath);
+                if (File.Exists(fullPath))
+                {
+                    _monitor.Log($"背景图片存在: {fullPath}", LogLevel.Debug);
+                    
+                    // 这里可以实现背景图片加载逻辑
+                }
+                else
+                {
+                    _monitor.Log($"背景图片不存在: {fullPath}", LogLevel.Warn);
+                }
+            }
+            catch (Exception ex)
+            {
+                _monitor.Log($"加载背景图片时出错: {ex.Message}", LogLevel.Error);
             }
         }
 

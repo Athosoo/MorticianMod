@@ -1,4 +1,5 @@
-﻿using MorticianMod.AssetLoader;
+using MorticianMod.NoteLoaderModel;
+using MorticianMod.AssetLoader;
 using MorticianMod.Interface;
 using StardewModdingAPI;
 using StardewValley.Delegates;

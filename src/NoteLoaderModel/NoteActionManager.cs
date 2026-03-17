@@ -4,7 +4,7 @@ using StardewValley;
 using System;
 using System.Collections.Generic;
 
-namespace MorticianMod.AssetLoader
+namespace MorticianMod.NoteLoaderModel
 {
     /// <summary>
     /// 纸条动作管理器
@@ -31,6 +31,14 @@ namespace MorticianMod.AssetLoader
         {
             try
             {
+                // 处理附件
+                if (noteData != null && noteData.Attachments != null && noteData.Attachments.Count > 0)
+                {
+                    _monitor.Log($"处理纸条附件: ID={noteData.Id}, 附件数量={noteData.Attachments.Count}", LogLevel.Debug);
+                    HandleAttachments(noteData.Attachments);
+                }
+
+                // 处理触发动作
                 if (noteData == null || noteData.TriggerActions == null || noteData.TriggerActions.Count == 0)
                 {
                     _monitor.Log("没有动作需要触发", LogLevel.Debug);
@@ -54,6 +62,56 @@ namespace MorticianMod.AssetLoader
             catch (Exception ex)
             {
                 _monitor.Log($"触发纸条动作时出错: {ex.Message}", LogLevel.Error);
+            }
+        }
+
+        /// <summary>
+        /// 处理附件
+        /// </summary>
+        /// <param name="attachments">附件列表</param>
+        private void HandleAttachments(List<Attachment> attachments)
+        {
+            try
+            {
+                foreach (var attachment in attachments)
+                {
+                    try
+                    {
+                        if (attachment.Type == "Item")
+                        {
+                            // 检查概率
+                            if (attachment.Chance < 1.0f && new Random().NextDouble() > attachment.Chance)
+                            {
+                                _monitor.Log($"附件 {attachment.ItemId} 概率检查失败，跳过", LogLevel.Debug);
+                                continue;
+                            }
+
+                            // 给予物品
+                            Item item = ItemRegistry.Create(attachment.ItemId, attachment.Quantity);
+                            if (item != null)
+                            {
+                                Game1.player.addItemByMenuIfNecessary(item);
+                                _monitor.Log($"给予附件物品: {attachment.ItemId} x {attachment.Quantity}", LogLevel.Debug);
+                            }
+                            else
+                            {
+                                _monitor.Log($"无法创建附件物品: {attachment.ItemId}", LogLevel.Error);
+                            }
+                        }
+                        else
+                        {
+                            _monitor.Log($"未知的附件类型: {attachment.Type}", LogLevel.Warn);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _monitor.Log($"处理附件时出错: {ex.Message}", LogLevel.Error);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _monitor.Log($"处理附件时出错: {ex.Message}", LogLevel.Error);
             }
         }
 

@@ -11,7 +11,7 @@ using System.Threading;
 using System.Xml;
 using System.IO;
 
-namespace MorticianMod.AssetLoader;
+namespace MorticianMod.NoteLoaderModel;
 
 public class NotesLoader : IAssetLoader
 {
