@@ -121,17 +121,9 @@ namespace MorticianMod.NoteLoaderModel
           if (Game1.player.CurrentItem != null && Game1.player.CurrentItem.Name == itemName)
           {
             Item currentItem = Game1.player.CurrentItem;
-            if (currentItem.Stack > 1)
-            {
-              currentItem.Stack--;
-              _monitor.Log($"{nameof(ItemUseDetector)}::减少秘密纸条物品数量: {itemName}, 剩余数量: {currentItem.Stack}", LogLevel.Info);
-            }
-            else
-            {
-              // 使用 removeItemFromInventory 方法移除物品
-              Game1.player.removeItemFromInventory(currentItem);
-              _monitor.Log($"{nameof(ItemUseDetector)}::从背包中删除秘密纸条物品: {itemName}", LogLevel.Info);
-            }
+            // 直接删除物品，因为秘密纸条应该是不可堆叠的
+            Game1.player.removeItemFromInventory(currentItem);
+            _monitor.Log($"{nameof(ItemUseDetector)}::从背包中删除秘密纸条物品: {itemName}", LogLevel.Info);
           }
         }
       }

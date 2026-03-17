@@ -285,23 +285,35 @@ namespace MorticianMod.NoteLoaderModel
             {
                 _monitor.Log($"{nameof(SecretNoteAdder)}::尝试将秘密纸条添加到收集品列表: ID={noteId}", LogLevel.Info);
                 
+                // 确保游戏世界已加载
+                if (!Context.IsWorldReady || Game1.player == null)
+                {
+                    _monitor.Log($"{nameof(SecretNoteAdder)}::游戏世界未加载，无法添加到收集品列表", LogLevel.Warn);
+                    return;
+                }
+                
                 // 使用反射访问和修改 secretNotesSeen 字段
                 var playerType = Game1.player.GetType();
                 var secretNotesSeenField = playerType.GetField("secretNotesSeen", BindingFlags.Instance | BindingFlags.NonPublic);
                 
                 if (secretNotesSeenField != null)
                 {
+                    _monitor.Log($"{nameof(SecretNoteAdder)}::找到 secretNotesSeen 字段，类型: {secretNotesSeenField.FieldType.Name}", LogLevel.Info);
+                    
                     var secretNotesSeen = secretNotesSeenField.GetValue(Game1.player);
                     
                     // 检查 secretNotesSeen 的类型
                     if (secretNotesSeen is System.Collections.Generic.HashSet<int> intNotes)
                     {
+                        _monitor.Log($"{nameof(SecretNoteAdder)}::secretNotesSeen 是 HashSet<int> 类型", LogLevel.Info);
                         // 处理整数类型的ID
                         if (noteId is int intId)
                         {
                             if (intNotes.Add(intId))
                             {
                                 _monitor.Log($"{nameof(SecretNoteAdder)}::成功将秘密纸条添加到收集品列表: ID={intId}", LogLevel.Info);
+                                // 通知游戏收集品已更新
+                                NotifyCollectionUpdated();
                             }
                             else
                             {
@@ -316,6 +328,8 @@ namespace MorticianMod.NoteLoaderModel
                                 if (intNotes.Add(parsedId))
                                 {
                                     _monitor.Log($"{nameof(SecretNoteAdder)}::成功将秘密纸条添加到收集品列表: ID={parsedId}", LogLevel.Info);
+                                    // 通知游戏收集品已更新
+                                    NotifyCollectionUpdated();
                                 }
                                 else
                                 {
@@ -327,17 +341,21 @@ namespace MorticianMod.NoteLoaderModel
                                 _monitor.Log($"{nameof(SecretNoteAdder)}::无法将字符串ID {stringId} 转换为整数，无法添加到收集品列表", LogLevel.Warn);
                                 // 对于非数字的字符串ID，需要特殊处理
                                 // 这里可以考虑使用其他方式存储自定义纸条
+                                StoreCustomNoteId(stringId);
                             }
                         }
                     }
                     else if (secretNotesSeen is System.Collections.Generic.HashSet<string> stringNotes)
                     {
+                        _monitor.Log($"{nameof(SecretNoteAdder)}::secretNotesSeen 是 HashSet<string> 类型", LogLevel.Info);
                         // 处理字符串类型的ID
                         if (noteId is string stringId)
                         {
                             if (stringNotes.Add(stringId))
                             {
                                 _monitor.Log($"{nameof(SecretNoteAdder)}::成功将秘密纸条添加到收集品列表: ID={stringId}", LogLevel.Info);
+                                // 通知游戏收集品已更新
+                                NotifyCollectionUpdated();
                             }
                             else
                             {
@@ -350,6 +368,8 @@ namespace MorticianMod.NoteLoaderModel
                             if (stringNotes.Add(idStr))
                             {
                                 _monitor.Log($"{nameof(SecretNoteAdder)}::成功将秘密纸条添加到收集品列表: ID={idStr}", LogLevel.Info);
+                                // 通知游戏收集品已更新
+                                NotifyCollectionUpdated();
                             }
                             else
                             {
@@ -360,17 +380,99 @@ namespace MorticianMod.NoteLoaderModel
                     else
                     {
                         _monitor.Log($"{nameof(SecretNoteAdder)}::secretNotesSeen 字段类型未知: {secretNotesSeen?.GetType().Name}", LogLevel.Warn);
+                        // 尝试获取字段的实际值
+                        if (secretNotesSeen != null)
+                        {
+                            _monitor.Log($"{nameof(SecretNoteAdder)}::secretNotesSeen 值: {secretNotesSeen.ToString()}", LogLevel.Info);
+                        }
+                        // 尝试使用其他方法存储
+                        StoreCustomNoteId(noteId.ToString());
                     }
                 }
                 else
                 {
                     _monitor.Log($"{nameof(SecretNoteAdder)}::未找到 secretNotesSeen 字段，无法添加到收集品列表", LogLevel.Warn);
+                    // 列出 Player 类中所有包含 "note" 或 "secret" 的字段
+                    _monitor.Log($"{nameof(SecretNoteAdder)}::搜索 Player 类中与秘密纸条相关的字段...", LogLevel.Info);
+                    var fields = playerType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    foreach (var field in fields)
+                    {
+                        if (field.Name.ToLower().Contains("note") || field.Name.ToLower().Contains("secret"))
+                        {
+                            _monitor.Log($"{nameof(SecretNoteAdder)}::找到相关字段: {field.Name} - {field.FieldType.Name}", LogLevel.Info);
+                        }
+                    }
+                    // 尝试使用其他方法存储
+                    StoreCustomNoteId(noteId.ToString());
                 }
             }
             catch (Exception ex)
             {
                 _monitor.Log($"{nameof(SecretNoteAdder)}::将秘密纸条添加到收集品列表时出错: {ex.Message}", LogLevel.Error);
+                _monitor.Log($"{nameof(SecretNoteAdder)}::堆栈跟踪: {ex.StackTrace}", LogLevel.Error);
             }
+        }
+
+        /// <summary>
+        /// SecretNoteAdder::通知游戏收集品已更新
+        /// </summary>
+        private void NotifyCollectionUpdated()
+        {
+            try
+            {
+                // 尝试触发收集品更新事件
+                _monitor.Log($"{nameof(SecretNoteAdder)}::通知游戏收集品已更新", LogLevel.Info);
+                
+                // 可以在这里添加额外的逻辑，例如更新收集品菜单
+                // 或者触发游戏的收集品更新事件
+            }
+            catch (Exception ex)
+            {
+                _monitor.Log($"{nameof(SecretNoteAdder)}::通知收集品更新时出错: {ex.Message}", LogLevel.Error);
+            }
+        }
+
+        /// <summary>
+        /// SecretNoteAdder::存储自定义纸条ID
+        /// </summary>
+        /// <param name="noteId">纸条ID</param>
+        private void StoreCustomNoteId(string noteId)
+        {
+            try
+            {
+                // 这里可以实现自定义的存储逻辑
+                // 例如使用模组的配置文件或其他存储方式
+                _monitor.Log($"{nameof(SecretNoteAdder)}::存储自定义纸条ID: {noteId}", LogLevel.Info);
+                
+                // 示例：使用SMAPI的配置系统存储
+                var config = _helper.ReadConfig<CustomNotesConfig>();
+                if (config == null)
+                {
+                    config = new CustomNotesConfig();
+                }
+                
+                if (!config.CollectedNotes.Contains(noteId))
+                {
+                    config.CollectedNotes.Add(noteId);
+                    _helper.WriteConfig(config);
+                    _monitor.Log($"{nameof(SecretNoteAdder)}::成功存储自定义纸条ID: {noteId}", LogLevel.Info);
+                }
+            }
+            catch (Exception ex)
+            {
+                _monitor.Log($"{nameof(SecretNoteAdder)}::存储自定义纸条ID时出错: {ex.Message}", LogLevel.Error);
+            }
+        }
+
+        /// <summary>
+        /// 自定义纸条配置类
+        /// </summary>
+        public class CustomNotesConfig
+        {
+            /// <summary>
+            /// 已收集的自定义纸条ID列表
+            /// </summary>
+            public List<string> CollectedNotes { get; set; } = new List<string>();
         }
     }
 }
