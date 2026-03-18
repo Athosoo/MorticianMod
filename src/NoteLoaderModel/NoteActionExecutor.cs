@@ -7,10 +7,10 @@ using System.Collections.Generic;
 namespace MorticianMod.NoteLoaderModel
 {
     /// <summary>
-    /// 纸条动作管理器
-    /// 负责处理秘密纸条的动作触发
+    /// 纸条动作执行器
+    /// 负责执行纸条相关动作
     /// </summary>
-    public class NoteActionManager
+    public class NoteActionExecutor
     {
         private IModHelper _helper;
         private IMonitor _monitor;
@@ -19,8 +19,8 @@ namespace MorticianMod.NoteLoaderModel
         {
             _helper = helper;
             _monitor = monitor;
-            
-            _monitor.Log("纸条动作管理器初始化完成", LogLevel.Debug);
+
+            _monitor.Log("纸条动作执行器初始化完成", LogLevel.Debug);
         }
 
         /// <summary>
@@ -124,17 +124,8 @@ namespace MorticianMod.NoteLoaderModel
         {
             switch (action.Type)
             {
-                case "ShowMessage":
-                    ShowMessage(action);
-                    break;
                 case "UnlockContent":
                     UnlockContent(action);
-                    break;
-                case "GiveItem":
-                    GiveItem(action);
-                    break;
-                case "ShowMap":
-                    ShowMap(action);
                     break;
                 case "AddQuest":
                     AddQuest(action);
@@ -142,20 +133,6 @@ namespace MorticianMod.NoteLoaderModel
                 default:
                     _monitor.Log($"未知的动作类型: {action.Type}", LogLevel.Warn);
                     break;
-            }
-        }
-
-        /// <summary>
-        /// 显示消息
-        /// </summary>
-        /// <param name="action">动作数据</param>
-        private void ShowMessage(TriggerAction action)
-        {
-            if (action.Parameters.TryGetValue("Message", out object messageObj) && messageObj is string message)
-            {
-                // 简化版 HUDMessage
-                Game1.addHUDMessage(new HUDMessage(message));
-                _monitor.Log($"显示消息: {message}", LogLevel.Debug);
             }
         }
 
@@ -170,37 +147,6 @@ namespace MorticianMod.NoteLoaderModel
                 // 这里可以实现解锁内容的逻辑
                 // 例如解锁新的区域、配方等
                 _monitor.Log($"解锁内容: {contentId}", LogLevel.Debug);
-            }
-        }
-
-        /// <summary>
-        /// 给予物品
-        /// </summary>
-        /// <param name="action">动作数据</param>
-        private void GiveItem(TriggerAction action)
-        {
-            if (action.Parameters.TryGetValue("ItemId", out object itemIdObj) && itemIdObj is string itemId &&
-                action.Parameters.TryGetValue("Quantity", out object quantityObj) && quantityObj is int quantity)
-            {
-                Item item = ItemRegistry.Create(itemId, quantity);
-                if (item != null)
-                {
-                    Game1.player.addItemByMenuIfNecessary(item);
-                    _monitor.Log($"给予物品: {itemId} x {quantity}", LogLevel.Debug);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 显示地图
-        /// </summary>
-        /// <param name="action">动作数据</param>
-        private void ShowMap(TriggerAction action)
-        {
-            if (action.Parameters.TryGetValue("MapName", out object mapNameObj) && mapNameObj is string mapName)
-            {
-                // 这里可以实现显示地图的逻辑
-                _monitor.Log($"显示地图: {mapName}", LogLevel.Debug);
             }
         }
 
