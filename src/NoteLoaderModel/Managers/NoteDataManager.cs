@@ -1,9 +1,10 @@
-﻿using StardewModdingAPI;
+using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using System.IO;
 using System.Text.Json;
 using MorticianMod.Interface;
 
-namespace MorticianMod.NoteLoaderModel
+namespace MorticianMod.NoteLoaderModel.Managers
 {
   /// <summary>
   /// 纸条数据管理器

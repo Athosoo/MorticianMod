@@ -1,9 +1,12 @@
-﻿using MorticianMod.Interface;
+using MorticianMod.Interface;
 using MorticianMod.ItemUseSystem;
+using MorticianMod.NoteLoaderModel.Core;
+using MorticianMod.NoteLoaderModel.Events;
+using MorticianMod.NoteLoaderModel.Managers;
 using MorticianMod.NoteLoaderModel.Strategies;
 using StardewModdingAPI;
 
-namespace MorticianMod.NoteLoaderModel
+namespace MorticianMod.NoteLoaderModel.Core
 {
   /// <summary>
   /// 纸条系统核心管理类
@@ -27,6 +30,7 @@ namespace MorticianMod.NoteLoaderModel
     // 物品使用系统
     private ItemUseManager _itemUseManager;
     private NoteUseStrategy _noteUseStrategy;
+    private NoteEventHandler _noteEventHandler;
 
     public void Register(IModHelper helper, IMonitor monitor)
     {
@@ -78,10 +82,17 @@ namespace MorticianMod.NoteLoaderModel
       // 创建纸条使用策略
       _noteUseStrategy = new NoteUseStrategy();
       _noteUseStrategy.Initialize(_helper, _monitor);
-      _noteUseStrategy.InjectManagers(
+
+      // 创建事件处理器
+      _noteEventHandler = new NoteEventHandler();
+      _noteEventHandler.Initialize(
           _noteDataManager,
           _noteActionExecutor,
-          _noteCollectionManager);
+          _noteCollectionManager,
+          _noteUIManager.GetNoteDisplayManager());
+
+      // 注入事件处理器到策略
+      _noteUseStrategy.InjectEventHandler(_noteEventHandler);
 
       // 注册策略
       _itemUseManager.RegisterStrategy(_noteUseStrategy);

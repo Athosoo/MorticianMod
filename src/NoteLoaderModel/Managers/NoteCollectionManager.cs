@@ -1,8 +1,8 @@
-﻿using MorticianMod.Interface;
+using MorticianMod.Interface;
 using StardewModdingAPI;
 using StardewValley;
 
-namespace MorticianMod.NoteLoaderModel
+namespace MorticianMod.NoteLoaderModel.Managers
 {
     /// <summary>
     /// 纸条收集管理器

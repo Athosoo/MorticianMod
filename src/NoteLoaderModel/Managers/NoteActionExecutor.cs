@@ -1,7 +1,7 @@
-﻿using StardewModdingAPI;
+using StardewModdingAPI;
 using StardewValley;
 
-namespace MorticianMod.NoteLoaderModel
+namespace MorticianMod.NoteLoaderModel.Managers
 {
     /// <summary>
     /// 纸条动作执行器

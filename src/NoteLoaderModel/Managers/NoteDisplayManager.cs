@@ -1,7 +1,8 @@
-﻿using StardewModdingAPI;
+using System.IO;
+using StardewModdingAPI;
 using StardewValley;
 
-namespace MorticianMod.NoteLoaderModel
+namespace MorticianMod.NoteLoaderModel.Managers
 {
     /// <summary>
     /// 纸条展示管理器

@@ -1,6 +1,6 @@
 using StardewModdingAPI;
 
-namespace MorticianMod.NoteLoaderModel
+namespace MorticianMod.NoteLoaderModel.Core
 {
     /// <summary>
     /// 模组入口静态引用
