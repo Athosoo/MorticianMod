@@ -1,11 +1,8 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
-using System;
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace MorticianMod.NoteLoaderModel
@@ -52,7 +49,7 @@ namespace MorticianMod.NoteLoaderModel
                 try
                 {
                     ConstructorInfo collectionspage_ctor = typeof(CollectionsPage)
-                            .GetConstructor(new[]{typeof(int),typeof(int),typeof(int),typeof(int)});
+                            .GetConstructor(new[] { typeof(int), typeof(int), typeof(int), typeof(int) });
                     ctorFullName = collectionspage_ctor.DeclaringType.FullName + "." +
                             collectionspage_ctor.Name;
                     harmony.Patch(original: collectionspage_ctor,
@@ -78,7 +75,7 @@ namespace MorticianMod.NoteLoaderModel
                 Type[] argTypes, string patch)
         {
             string[] parts = patch.Split("_");
-            string last = parts[parts.Length-1];
+            string last = parts[parts.Length - 1];
             if (last != "Prefix" && last != "Postfix" && last != "Transpiler")
             {
                 _monitor.Log($"Skipping patch method '{patch}': bad type '{last}'", LogLevel.Error);

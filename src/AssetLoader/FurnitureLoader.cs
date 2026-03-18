@@ -1,10 +1,10 @@
-﻿using MorticianMod.Interface;
+﻿using Microsoft.Xna.Framework.Graphics; // 或者使用 Newtonsoft.Json，这里用 System.Text.Json
+using MorticianMod.Interface;
 using MorticianMod.Models;
+using MorticianMod.src;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using System.Text.Json;
-using Microsoft.Xna.Framework.Graphics; // 或者使用 Newtonsoft.Json，这里用 System.Text.Json
-using MorticianMod.src;
 
 namespace MorticianMod.AssetLoader
 {
@@ -12,7 +12,7 @@ namespace MorticianMod.AssetLoader
     {
         public string LoaderName => "FurnitureLoader";
         public string LoaderDescription => "用于加载assets/furniture加载器类";
-        private string _UniqueID = ModInfo._UniqueID; 
+        private string _UniqueID = ModInfo._UniqueID;
         private IModHelper _helper;
         private IMonitor _monitor;
         public void Register(IModHelper helper, IMonitor monitor)
@@ -109,14 +109,14 @@ namespace MorticianMod.AssetLoader
             }
             else if (e.NameWithoutLocale.StartsWith($"{_UniqueID}"))
             {
-                _monitor.Log($"[{_UniqueID}]::{e.NameWithoutLocale}",LogLevel.Debug);
+                _monitor.Log($"[{_UniqueID}]::{e.NameWithoutLocale}", LogLevel.Debug);
                 if (cachedFurnitureData == null)
                 {
-                    _monitor.Log($"[{_UniqueID}]::缓存列表为空",LogLevel.Debug);
+                    _monitor.Log($"[{_UniqueID}]::缓存列表为空", LogLevel.Debug);
                 }
                 foreach (var furn in cachedFurnitureData)
                 {
-                    _monitor.Log($"[{_UniqueID}]::缓存列表中元素数量:{cachedFurnitureData.Count}",LogLevel.Debug);
+                    _monitor.Log($"[{_UniqueID}]::缓存列表中元素数量:{cachedFurnitureData.Count}", LogLevel.Debug);
                     if (e.NameWithoutLocale.IsEquivalentTo($"{_UniqueID}|{furn.Texture}"))
                     {
                         string path_now = furn.Texture.Replace("|", "/");

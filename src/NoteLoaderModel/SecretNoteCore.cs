@@ -1,6 +1,7 @@
-using MorticianMod.Interface;
+﻿using MorticianMod.Interface;
+using MorticianMod.ItemUseSystem;
+using MorticianMod.NoteLoaderModel.Strategies;
 using StardewModdingAPI;
-using System;
 
 namespace MorticianMod.NoteLoaderModel
 {
@@ -23,38 +24,70 @@ namespace MorticianMod.NoteLoaderModel
     private NoteCollectionManager _noteCollectionManager;
     private NoteUIManager _noteUIManager;
 
+    // 物品使用系统
+    private ItemUseManager _itemUseManager;
+    private NoteUseStrategy _noteUseStrategy;
+
     public void Register(IModHelper helper, IMonitor monitor)
-        {
-            _helper = helper;
-            _monitor = monitor;
+    {
+      _helper = helper;
+      _monitor = monitor;
 
-            // 初始化静态引用
-            ModEntry.Initialize(helper, monitor);
+      // 初始化静态引用
+      ModEntry.Initialize(helper, monitor);
 
-            _monitor.Log("初始化纸条系统核心...", LogLevel.Debug);
+      _monitor.Log("初始化纸条系统核心...", LogLevel.Debug);
 
-            // 初始化子模块
-            _noteDataManager = new NoteDataManager();
-            _noteActionExecutor = new NoteActionExecutor();
-            _noteCollectionManager = new NoteCollectionManager();
-            _noteItemManager = new NoteItemManager();
-            _noteUIManager = new NoteUIManager();
+      // 初始化子模块
+      _noteDataManager = new NoteDataManager();
+      _noteActionExecutor = new NoteActionExecutor();
+      _noteCollectionManager = new NoteCollectionManager();
+      _noteItemManager = new NoteItemManager();
+      _noteUIManager = new NoteUIManager();
 
-            // 依赖注入
-            _noteDataManager.Initialize(helper, monitor);
-            _noteActionExecutor.Initialize(helper, monitor);
-            _noteCollectionManager.Initialize(helper, monitor);
-            _noteItemManager.Initialize(helper, monitor, _noteDataManager);
-            _noteUIManager.Initialize(helper, monitor, _noteDataManager, _noteCollectionManager);
+      // 依赖注入
+      _noteDataManager.Initialize(helper, monitor);
+      _noteActionExecutor.Initialize(helper, monitor);
+      _noteCollectionManager.Initialize(helper, monitor);
+      _noteItemManager.Initialize(helper, monitor, _noteDataManager);
+      _noteUIManager.Initialize(helper, monitor, _noteDataManager, _noteCollectionManager);
 
-            // 注册事件
-            _helper.Events.Content.AssetRequested += OnAssetRequested;
+      // 初始化物品使用系统
+      InitializeItemUseSystem();
 
-            // 应用补丁
-            _noteUIManager.ApplyPatches();
+      // 注册事件
+      _helper.Events.Content.AssetRequested += OnAssetRequested;
 
-            _monitor.Log("纸条系统核心初始化完成", LogLevel.Debug);
-        }
+      // 应用补丁
+      _noteUIManager.ApplyPatches();
+
+      _monitor.Log("纸条系统核心初始化完成", LogLevel.Debug);
+    }
+
+    /// <summary>
+    /// 初始化物品使用系统
+    /// </summary>
+    private void InitializeItemUseSystem()
+    {
+      _monitor.Log("初始化物品使用系统...", LogLevel.Debug);
+
+      // 创建物品使用管理器
+      _itemUseManager = new ItemUseManager();
+      _itemUseManager.Initialize(_helper, _monitor);
+
+      // 创建纸条使用策略
+      _noteUseStrategy = new NoteUseStrategy();
+      _noteUseStrategy.Initialize(_helper, _monitor);
+      _noteUseStrategy.InjectManagers(
+          _noteDataManager,
+          _noteActionExecutor,
+          _noteCollectionManager);
+
+      // 注册策略
+      _itemUseManager.RegisterStrategy(_noteUseStrategy);
+
+      _monitor.Log("物品使用系统初始化完成", LogLevel.Debug);
+    }
 
     public void OnAssetRequested(object sender, StardewModdingAPI.Events.AssetRequestedEventArgs e)
     {

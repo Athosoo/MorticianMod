@@ -1,8 +1,5 @@
-using MorticianMod.Models;
-using StardewModdingAPI;
+﻿using StardewModdingAPI;
 using StardewValley;
-using System;
-using System.Collections.Generic;
 
 namespace MorticianMod.NoteLoaderModel
 {

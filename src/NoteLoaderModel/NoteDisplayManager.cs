@@ -1,11 +1,5 @@
-using MorticianMod.Models;
-using StardewModdingAPI;
+﻿using StardewModdingAPI;
 using StardewValley;
-using StardewValley.Menus;
-using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 
 namespace MorticianMod.NoteLoaderModel
 {
@@ -22,7 +16,7 @@ namespace MorticianMod.NoteLoaderModel
         {
             _helper = helper;
             _monitor = monitor;
-            
+
             _monitor.Log("纸条展示管理器初始化完成", LogLevel.Debug);
         }
 
@@ -66,12 +60,12 @@ namespace MorticianMod.NoteLoaderModel
                 {
                     // 标记为已读
                     MarkNoteAsRead(noteData.IntId);
-                    
+
                     // 显示纸条 - 使用Game1.drawLetterMessage方法
                     try
                     {
                         _monitor.Log("尝试使用drawLetterMessage显示纸条...", LogLevel.Debug);
-                        
+
                         // 使用drawLetterMessage方法显示纸条内容
                         Game1.drawLetterMessage(noteData.ContentText);
                         _monitor.Log($"成功显示纸条: ID={noteData.IntId}", LogLevel.Debug);
@@ -80,7 +74,7 @@ namespace MorticianMod.NoteLoaderModel
                     {
                         _monitor.Log($"显示纸条时出错: {ex.Message}", LogLevel.Error);
                         _monitor.Log($"堆栈跟踪: {ex.StackTrace}", LogLevel.Error);
-                        
+
                         // 备用方案：显示提示信息
                         Game1.addHUDMessage(new HUDMessage($"秘密纸条 #{noteData.IntId}: {noteData.ContentText}"));
                         _monitor.Log($"使用备用方案显示纸条内容: {noteData.ContentText}", LogLevel.Debug);
@@ -107,13 +101,13 @@ namespace MorticianMod.NoteLoaderModel
             try
             {
                 _monitor.Log($"尝试加载内容图片: {imagePath}", LogLevel.Debug);
-                
+
                 // 检查图片文件是否存在
                 string fullPath = Path.Combine(_helper.DirectoryPath, imagePath);
                 if (File.Exists(fullPath))
                 {
                     _monitor.Log($"内容图片存在: {fullPath}", LogLevel.Debug);
-                    
+
                     // 这里可以实现图片加载逻辑
                     // 由于drawLetterMessage不直接支持图片，我们可以考虑其他方式
                     // 例如创建自定义菜单或使用其他显示方式
@@ -138,13 +132,13 @@ namespace MorticianMod.NoteLoaderModel
             try
             {
                 _monitor.Log($"尝试加载背景图片: {imagePath}", LogLevel.Debug);
-                
+
                 // 检查图片文件是否存在
                 string fullPath = Path.Combine(_helper.DirectoryPath, imagePath);
                 if (File.Exists(fullPath))
                 {
                     _monitor.Log($"背景图片存在: {fullPath}", LogLevel.Debug);
-                    
+
                     // 这里可以实现背景图片加载逻辑
                 }
                 else
@@ -201,7 +195,7 @@ namespace MorticianMod.NoteLoaderModel
                 {
                     var playerType = Game1.player.GetType();
                     var secretNotesSeenField = playerType.GetField("secretNotesSeen", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                    
+
                     if (secretNotesSeenField != null)
                     {
                         var secretNotesSeen = secretNotesSeenField.GetValue(Game1.player) as System.Collections.Generic.HashSet<int>;

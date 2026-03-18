@@ -1,7 +1,4 @@
-using MorticianMod.Models;
-using Newtonsoft.Json;
-using System.Net.Mail;
-using StardewValley.GameData.Objects;
+﻿using Newtonsoft.Json;
 
 public class CustomSecretNoteData
 {
@@ -9,7 +6,7 @@ public class CustomSecretNoteData
     public string Id { get; set; }
 
     [JsonProperty("Condition")]
-    public ConditionData Condition { get; set; } 
+    public ConditionData Condition { get; set; }
 
     [JsonProperty("BackgroundImagePath")]
     public string BackgroundImagePath { get; set; }
@@ -17,7 +14,7 @@ public class CustomSecretNoteData
     [JsonProperty("ContentImagePath")]
     public string ContentImagePath { get; set; }
 
-    [JsonProperty("ContentText")]     
+    [JsonProperty("ContentText")]
     public string ContentText { get; set; }
 
     [JsonProperty("Attachments")]
