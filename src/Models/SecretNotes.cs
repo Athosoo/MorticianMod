@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 public class CustomSecretNoteData
 {
@@ -49,7 +49,7 @@ public class TriggerAction
 
 public class NotesDatasWrapper
 {
-    public List<CustomSecretNoteData>? NoteDatas { get; set; }
+    public List<CustomSecretNoteData> NoteDatas { get; set; }
 }
 
 public class Attachment
@@ -84,4 +84,3 @@ public class TextureData
     [JsonProperty("Y")]
     public int Y { get; set; }
 }
-

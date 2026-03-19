@@ -63,9 +63,9 @@ namespace MorticianMod.NoteLoaderModel.Managers
                       nameof(Patches.CollectionsPage_ctor_Postfix)));
           _monitor.Log($"Patched (Postfix) {ctorFullName}", LogLevel.Debug);
         }
-        catch (Exception e)
+        catch (Exception)
         {
-          _monitor.Log($"Patch failed ({ctorFullName}): {e}", LogLevel.Error);
+          _monitor.Log($"Patch failed ({ctorFullName})", LogLevel.Error);
         }
       }
       catch (Exception ex)
@@ -125,21 +125,21 @@ namespace MorticianMod.NoteLoaderModel.Managers
     }
 
     /// <summary>
-        /// 显示纸条内容
-        /// </summary>
-        /// <param name="noteData">纸条数据</param>
-        public void ShowSecretNote(CustomSecretNoteData noteData)
-        {
-            _noteDisplayManager.ShowSecretNote(noteData);
-        }
+    /// 显示纸条内容
+    /// </summary>
+    /// <param name="noteData">纸条数据</param>
+    public void ShowSecretNote(CustomSecretNoteData noteData)
+    {
+      _noteDisplayManager.ShowSecretNote(noteData);
+    }
 
-        /// <summary>
-        /// 获取纸条显示管理器
-        /// </summary>
-        public NoteDisplayManager GetNoteDisplayManager()
-        {
-            return _noteDisplayManager;
-        }
+    /// <summary>
+    /// 获取纸条显示管理器
+    /// </summary>
+    public NoteDisplayManager GetNoteDisplayManager()
+    {
+      return _noteDisplayManager;
+    }
 
     /// <summary>
     /// 内部补丁类
@@ -225,7 +225,7 @@ namespace MorticianMod.NoteLoaderModel.Managers
             ++index;
           }
         }
-        catch (Exception e)
+        catch
         {
           // 静默处理异常，避免影响游戏
         }
@@ -277,7 +277,7 @@ namespace MorticianMod.NoteLoaderModel.Managers
           noteDisplayManager.ShowSecretNote(noteData);
 
         }
-        catch (Exception e)
+        catch
         {
           // 静默处理异常，避免影响游戏
         }

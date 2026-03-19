@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace MorticianMod.Models
 {
@@ -68,19 +68,19 @@ namespace MorticianMod.Models
         /// 可选，自定义纹理资产名称，默认使用 "TileSheets/furniture"。
         /// </summary>
         [JsonPropertyName("texture")]
-        public string? Texture { get; set; }
+        public string Texture { get; set; }
 
         /// <summary>
         /// 可选，是否禁止在随机商店库存和家具目录中出现，默认 false。
         /// </summary>
         [JsonPropertyName("off_limits_for_random_sale")]
-        public bool? OffLimitsForRandomSale { get; set; }
+        public bool OffLimitsForRandomSale { get; set; }
 
         /// <summary>
         /// 可选，空格分隔的上下文标签列表。
         /// </summary>
         [JsonPropertyName("context_tags")]
-        public string? ContextTags { get; set; }
+        public string ContextTags { get; set; }
     }
 
     /// <summary>
